@@ -27,18 +27,23 @@ async def on_message(message: discord.Message):
     if message.channel.id == SOURCE_CHANNEL_ID:
         thread = message.guild.get_thread(THREAD_ID)
         if thread:
-            content = f"**{message.author.display_name}:** {message.content}" if message.content else None
-            files = [await attachment.to_file() for attachment in message.attachments] if message.attachments else []
-            embeds = message.embeds if message.embeds else []
-
             try:
+                # Текст
+                content = message.content if message.content else None
+
+                # Вложения
+                files = [await a.to_file() for a in message.attachments] if message.attachments else None
+
+                # Embeds (копируем их как есть)
+                embeds = message.embeds if message.embeds else None
+
                 if content or files or embeds:
                     await thread.send(content=content, files=files, embeds=embeds)
-                    print(f"➡ Сообщение от {message.author.display_name} переслано (текст/файлы/embeds).")
+                    print(f"➡ Переслано сообщение из {message.channel.name}")
                 else:
-                    print(f"⚠ Сообщение от {message.author.display_name} было пустым (ничего не переслано).")
+                    print(f"⚠ Пустое сообщение (ничего не переслано).")
             except Exception as e:
-                print(f"❌ Ошибка при отправке сообщения: {e}")
+                print(f"❌ Ошибка при пересылке: {e}")
 
     await bot.process_commands(message)
 
